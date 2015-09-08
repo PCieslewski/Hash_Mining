@@ -11,8 +11,7 @@ object Main extends App{
 
   sealed trait Msg
   case class WorkBlock(stringList: List[String]) extends Msg
-  case class WorkResponse(str: String, hash: String) extends Msg
-  case class NotFoundResponse() extends Msg
+  case class WorkResponse(inputStrings: List[String], hashes: List[String]) extends Msg
 
   //var sgen = new StringGen("pawel")
 
@@ -38,19 +37,20 @@ object Main extends App{
     def receive = {
       case WorkBlock(stringList: List[String]) =>
 
-        //val hashes = new ListBuffer[String]()
-        //val inputStrings = new ListBuffer[String]()
+        val hashes = new ListBuffer[String]()
+        val inputStrings = new ListBuffer[String]()
 
         for(str <- stringList){
           val hash = hash256(str)
 
           if(hash.startsWith(zeroString)) {
-            sender ! new WorkResponse(str,hash)
+            hashes += hash
+            inputStrings += str
           }
-          else{
-            sender ! new NotFoundResponse()
-          }
+
         }
+
+        sender ! new WorkResponse(inputStrings.toList, hashes.toList)
 
     }
 
@@ -60,19 +60,21 @@ object Main extends App{
 
     val props = Props(classOf[Worker], 3)
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
-    val sgen = new StringGen("pawel")
+    val sgen = new StringGen("steelerfan2010")
 
     for(i <- 0 to 100){
       workerRouter ! new WorkBlock(sgen.genStringBlock(500))
     }
 
     def receive = {
-      case WorkResponse(str: String, hash: String) =>
-        workerRouter ! new WorkBlock(sgen.genStringBlock(500))
-        println("FOUND! Hash " + str + " is " + hash)
+      case WorkResponse(inputStrings: List[String], hashes: List[String]) =>
 
-      case NotFoundResponse() =>
         workerRouter ! new WorkBlock(sgen.genStringBlock(500))
+
+        for(i <- inputStrings.indices){
+          println("FOUND! Hash " + inputStrings(i) + " is " + hashes(i))
+        }
+
     }
 
   }
