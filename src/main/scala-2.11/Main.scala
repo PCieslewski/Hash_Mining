@@ -58,9 +58,9 @@ object Main extends App{
 
   class Manager(numWorkers: Int) extends Actor {
 
-    val props = Props(classOf[Worker], 3)
+    val props = Props(classOf[Worker], 5)
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
-    val sgen = new StringGen("steelerfan2010")
+    val sgen = new StringGen("pawel")
 
     for(i <- 0 to 100){
       workerRouter ! new WorkBlock(sgen.genStringBlock(500))
