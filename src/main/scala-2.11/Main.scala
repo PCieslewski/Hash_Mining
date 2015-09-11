@@ -7,18 +7,30 @@ import scala.collection.mutable.ListBuffer
 
 object Main extends App{
 
-  val numWorkers : Int = 8
+  val isLocal = true
+
+  val NUM_WORKERS : Int = 8
+  val NUM_INIT_MSGS : Int = 100
+  val NUM_ZEROS : Int = 3
+  val NUM_MSGS_PER_BLOCK : Int = 1000
 
   sealed trait Msg
+  case class Connect(numInitMsgs: Int) extends Msg
   case class WorkBlock(stringList: List[String]) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String]) extends Msg
 
-  val system = ActorSystem("HelloSystem")
-  val manActor = system.actorOf(Props(new Manager(numWorkers)), name = "manActor")
+  //val system = ActorSystem("HelloSystem")
+  //val manActor = system.actorOf(Props(new Manager(numWorkers)), name = "manActor")
+
+  val bigSystem = ActorSystem("BigSystem")
+  val bigDaddy = bigSystem.actorOf(Props(BigDaddy), name = "BigDaddy")
+
+  val workerSystem = ActorSystem("WorkerSystem")
+  val localMiddleMan = workerSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, isLocal)), name = "LocalMiddleMan")
 
   //Defining hashing function
   def hash256(in : String): String = {
-    val bytes: Array[Byte] = (MessageDigest.getInstance("SHA-256")).digest(in.getBytes("UTF-8"))
+    val bytes: Array[Byte] = MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8"))
     val sep: String = ""
     bytes.map("%02x".format(_)).mkString(sep)
   }
@@ -30,6 +42,7 @@ object Main extends App{
     val zeroString = ("%0"+numZeros.toString+"d").format(0)
 
     def receive = {
+
       case WorkBlock(stringList: List[String]) =>
 
         val hashes = new ListBuffer[String]()
@@ -52,24 +65,60 @@ object Main extends App{
   }
 
   //Define Manager Actor
-  class Manager(numWorkers: Int) extends Actor {
+  class MiddleMan(numWorkers: Int, isLocal: Boolean) extends Actor {
 
-    val props = Props(classOf[Worker], 3)
+    /*var daddy = context.actorSelection(bigDaddy.path)
+    if(!isLocal){
+      daddy = context.actorSelection("akka.tcp://BigSystem@192.168.1.135:8008/user/BigDaddy")
+    }*/
+
+    val props = Props(classOf[Worker], NUM_ZEROS) //NOT PASSED IN CONSTANT
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
-    val sgen = new StringGen("pawel")
 
-    for(i <- 0 to 100){
-      workerRouter ! new WorkBlock(sgen.genStringBlock(500))
+    if(isLocal) {
+      bigDaddy ! new Connect(NUM_INIT_MSGS)
+    }
+    else{
+      val daddy = context.actorSelection("akka.tcp://BigSystem@192.168.1.135:8008/user/BigDaddy")
+      daddy ! new Connect(NUM_INIT_MSGS)
     }
 
     def receive = {
-      case WorkResponse(inputStrings: List[String], hashes: List[String]) =>
 
-        workerRouter ! new WorkBlock(sgen.genStringBlock(500))
+      case wb: WorkBlock => {
+        workerRouter ! wb
+      }
 
-        for(i <- inputStrings.indices){
+      case wr: WorkResponse => {
+        bigDaddy ! wr
+      }
+
+    }
+
+  }
+
+  object BigDaddy extends Actor {
+
+    val sgen = new StringGen("pawel")
+
+    def receive = {
+      case Connect(numInitMsgs: Int) => {
+
+        for(i <- 0 to numInitMsgs){
+          sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
+        }
+
+      }
+
+      case WorkResponse(inputStrings: List[String], hashes: List[String]) => {
+
+        sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
+
+        for (i <- inputStrings.indices) {
           println("FOUND! Hash " + inputStrings(i) + " is " + hashes(i))
         }
+
+      }
 
     }
 
