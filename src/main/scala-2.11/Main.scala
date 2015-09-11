@@ -23,10 +23,11 @@ object Main extends App{
   //val manActor = system.actorOf(Props(new Manager(numWorkers)), name = "manActor")
 
   val bigSystem = ActorSystem("BigSystem")
+  //val bigSystem = ActorSystem("BigSystem")
   val bigDaddy = bigSystem.actorOf(Props(BigDaddy), name = "BigDaddy")
 
-  val workerSystem = ActorSystem("WorkerSystem")
-  val localMiddleMan = workerSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, isLocal)), name = "LocalMiddleMan")
+  // val workerSystem = ActorSystem("WorkerSystem")
+  val localMiddleMan = bigSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, isLocal)), name = "LocalMiddleMan")
 
   //Defining hashing function
   def hash256(in : String): String = {
@@ -104,6 +105,8 @@ object Main extends App{
     def receive = {
       case Connect(numInitMsgs: Int) => {
 
+        println("New Connection! "+sender.path.toString)
+
         for(i <- 0 to numInitMsgs){
           sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
         }
@@ -115,7 +118,7 @@ object Main extends App{
         sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
 
         for (i <- inputStrings.indices) {
-          println("FOUND! Hash " + inputStrings(i) + " is " + hashes(i))
+          //println("FOUND! Hash " + inputStrings(i) + " is " + hashes(i))
         }
 
       }
