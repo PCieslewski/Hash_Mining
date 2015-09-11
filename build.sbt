@@ -1,4 +1,4 @@
-name := "PiCalc"
+name := "Project1"
 
 version := "1.0"
 

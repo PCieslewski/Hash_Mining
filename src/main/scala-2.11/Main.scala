@@ -13,16 +13,10 @@ object Main extends App{
   case class WorkBlock(stringList: List[String]) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String]) extends Msg
 
-  //var sgen = new StringGen("pawel")
-
   val system = ActorSystem("HelloSystem")
   val manActor = system.actorOf(Props(new Manager(numWorkers)), name = "manActor")
-  //val manActor = system.actorOf(Props(new Manager(numWorkers,numBlocks,lenBlock)), name = "manActor")
 
-  //val system = ActorSystem("HelloSystem")
-  //val worker = system.actorOf(Props(new Worker(1)), name = "worker")
-  //worker ! new WorkBlock(sgen.genStringBlock(50))
-
+  //Defining hashing function
   def hash256(in : String): String = {
     val bytes: Array[Byte] = (MessageDigest.getInstance("SHA-256")).digest(in.getBytes("UTF-8"))
     val sep: String = ""
@@ -32,6 +26,7 @@ object Main extends App{
   //Define Worker Actor
   class Worker(numZeros: Int) extends Actor{
 
+    //Create a zero string of length numZeros
     val zeroString = ("%0"+numZeros.toString+"d").format(0)
 
     def receive = {
@@ -56,9 +51,10 @@ object Main extends App{
 
   }
 
+  //Define Manager Actor
   class Manager(numWorkers: Int) extends Actor {
 
-    val props = Props(classOf[Worker], 5)
+    val props = Props(classOf[Worker], 3)
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
     val sgen = new StringGen("pawel")
 
@@ -80,7 +76,3 @@ object Main extends App{
   }
 
 }
-
-/*for(i <- 0 to 400) {
-    println(sgen.genString())
-  }*/
