@@ -68,19 +68,15 @@ object Main extends App{
   //Define Manager Actor
   class MiddleMan(numWorkers: Int, isLocal: Boolean) extends Actor {
 
-    /*var daddy = context.actorSelection(bigDaddy.path)
-    if(!isLocal){
-      daddy = context.actorSelection("akka.tcp://BigSystem@192.168.1.135:8008/user/BigDaddy")
-    }*/
-
     val props = Props(classOf[Worker], NUM_ZEROS) //NOT PASSED IN CONSTANT
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
+    var daddy : ActorSelection = context.actorSelection(bigDaddy.path)
 
     if(isLocal) {
       bigDaddy ! new Connect(NUM_INIT_MSGS)
     }
     else{
-      val daddy = context.actorSelection("akka.tcp://BigSystem@192.168.1.135:8008/user/BigDaddy")
+      daddy = context.actorSelection("akka.tcp://BigSystem@192.168.1.245:8009/user/BigDaddy")
       daddy ! new Connect(NUM_INIT_MSGS)
     }
 
@@ -91,7 +87,12 @@ object Main extends App{
       }
 
       case wr: WorkResponse => {
-        bigDaddy ! wr
+        if(isLocal){
+          bigDaddy ! wr
+        }
+        else{
+          daddy ! wr
+        }
       }
 
     }
