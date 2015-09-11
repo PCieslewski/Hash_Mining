@@ -17,7 +17,7 @@ object Main extends App{
   sealed trait Msg
   case class Connect(numInitMsgs: Int) extends Msg
   case class WorkBlock(stringList: List[String]) extends Msg
-  case class WorkResponse(inputStrings: List[String], hashes: List[String]) extends Msg
+  case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
   //val system = ActorSystem("HelloSystem")
   //val manActor = system.actorOf(Props(new Manager(numWorkers)), name = "manActor")
@@ -59,7 +59,7 @@ object Main extends App{
 
         }
 
-        sender ! new WorkResponse(inputStrings.toList, hashes.toList)
+        sender ! new WorkResponse(inputStrings.toList, hashes.toList, "PAWEL")
 
     }
 
@@ -113,12 +113,12 @@ object Main extends App{
 
       }
 
-      case WorkResponse(inputStrings: List[String], hashes: List[String]) => {
+      case WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) => {
 
         sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
 
         for (i <- inputStrings.indices) {
-          //println("FOUND! Hash " + inputStrings(i) + " is " + hashes(i))
+          println(finder + " found a hash! Hash: " + inputStrings(i) + " is " + hashes(i))
         }
 
       }
