@@ -3,7 +3,7 @@ import java.net.{NetworkInterface, InetAddress}
 import akka.actor._
 import akka.routing.{SmallestMailboxRouter, RoundRobinRouter}
 import java.security.MessageDigest
-//import java.net.
+import java.net._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -22,11 +22,26 @@ object Main extends App{
   case class WorkBlock(stringList: List[String]) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
+  val nets = NetworkInterface.getNetworkInterfaces
+
+  while(nets.hasMoreElements){
+    var temp = nets.nextElement().getInetAddresses
+    while(temp.hasMoreElements){
+      println(temp.nextElement().getHostAddress)
+    }
+  }
+
+  //val temp = nets.nextElement().getInetAddresses
+
+  //while(temp.hasMoreElements){
+  //  println(temp.nextElement().getHostAddress)
+  //}
+
   if(isLocal){
-    initLocalSystem()
+    //initLocalSystem()
   }
   else{
-    initRemoteSystem()
+    //initRemoteSystem()
   }
 
   //val bigSystem = ActorSystem("BigSystem")
