@@ -19,15 +19,37 @@ object Main extends App{
   case class WorkBlock(stringList: List[String]) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
-  //val system = ActorSystem("HelloSystem")
-  //val manActor = system.actorOf(Props(new Manager(numWorkers)), name = "manActor")
+  if(isLocal){
+    initLocalSystem()
+  }
+  else{
+    initRemoteSystem()
+  }
 
-  val bigSystem = ActorSystem("BigSystem")
   //val bigSystem = ActorSystem("BigSystem")
-  val bigDaddy = bigSystem.actorOf(Props(BigDaddy), name = "BigDaddy")
+  //val bigSystem = ActorSystem("BigSystem")
+  //val bigDaddy = bigSystem.actorOf(Props(BigDaddy), name = "BigDaddy")
 
-  // val workerSystem = ActorSystem("WorkerSystem")
-  val localMiddleMan = bigSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, isLocal)), name = "LocalMiddleMan")
+  //val workerSystem = ActorSystem("WorkerSystem")
+  //val localMiddleMan = bigSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, isLocal)), name = "LocalMiddleMan")
+
+  def initLocalSystem(){
+    val bigSystem = ActorSystem("BigSystem")
+    val bigDaddy = bigSystem.actorOf(Props(new BigDaddy()), name = "BigDaddy")
+
+    val daddy = bigSystem.actorSelection(bigDaddy.path)
+
+    val middleMan = bigSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, daddy)), name = "MiddleMan")
+
+  }
+
+  def initRemoteSystem(){
+    val remoteSystem = ActorSystem("RemoteSystem")
+    val daddy = remoteSystem.actorSelection("akka.tcp://BigSystem@192.168.1.245:8009/user/BigDaddy")
+
+    val middleMan = remoteSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, daddy)), name = "MiddleMan")
+
+  }
 
   //Defining hashing function
   def hash256(in : String): String = {
@@ -66,19 +88,13 @@ object Main extends App{
   }
 
   //Define Manager Actor
-  class MiddleMan(numWorkers: Int, isLocal: Boolean) extends Actor {
+  class MiddleMan(numWorkers: Int, daddy: ActorSelection) extends Actor {
 
     val props = Props(classOf[Worker], NUM_ZEROS) //NOT PASSED IN CONSTANT
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
-    var daddy : ActorSelection = context.actorSelection(bigDaddy.path)
+    //var daddy : ActorSelection = context.actorSelection(daddyPath)
 
-    if(isLocal) {
-      bigDaddy ! new Connect(NUM_INIT_MSGS)
-    }
-    else{
-      daddy = context.actorSelection("akka.tcp://BigSystem@192.168.1.245:8009/user/BigDaddy")
-      daddy ! new Connect(NUM_INIT_MSGS)
-    }
+    daddy ! new Connect(NUM_INIT_MSGS)
 
     def receive = {
 
@@ -87,19 +103,14 @@ object Main extends App{
       }
 
       case wr: WorkResponse => {
-        if(isLocal){
-          bigDaddy ! wr
-        }
-        else{
-          daddy ! wr
-        }
+        daddy ! wr
       }
 
     }
 
   }
 
-  object BigDaddy extends Actor {
+  class BigDaddy() extends Actor {
 
     val sgen = new StringGen("pawel")
 
