@@ -5,6 +5,8 @@ import akka.routing.{SmallestMailboxRouter, RoundRobinRouter}
 import java.security.MessageDigest
 import java.net._
 
+import com.typesafe.config.ConfigFactory
+
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -45,8 +47,46 @@ object Main extends App{
   }
 
   def initLocalSystem(){
-    val bigSystem = ActorSystem("BigSystem")
+    val backup = ConfigFactory.load("application.conf")
+
+    val a = """
+    akka {
+      loglevel = "INFO"
+
+      actor {
+        provider = "akka.remote.RemoteActorRefProvider"
+      }
+
+      remote {
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = """
+
+    val b = "\""+getIP()+"\""
+
+    val c = """
+    port = 8009
+      }
+
+      log-sent-messages = on
+      log-received-messages = on
+      }
+
+      }"""
+
+    val testConf = ConfigFactory.parseString(a+b+c)
+
+
+
+    println(testConf.toString())
+
+    val bigSystem = ActorSystem("BigSystem", testConf.withFallback(backup))
+    //val bigSystem = ActorSystem("BigSystem")
     val bigDaddy = bigSystem.actorOf(Props(new BigDaddy()), name = "BigDaddy")
+
+    //val myConfig = ConfigFactory.load("application.conf")
+    //val backup = ConfigFactory.parseString("akka.remote.netty.hostname = "+getIP())   // same tree structure as config file where hostname value usually goes
+    //val system = ActorSystem("BigSystem", backup.withFallback(myConfig))
 
     val daddy = bigSystem.actorSelection(bigDaddy.path)
 
@@ -57,6 +97,10 @@ object Main extends App{
   def initRemoteSystem(){
     val remoteSystem = ActorSystem("RemoteSystem")
     val daddy = remoteSystem.actorSelection("akka.tcp://BigSystem@192.168.1.245:8009/user/BigDaddy")
+
+    //val myConfig = ConfigFactory.load("application.conf")
+    //val backup = ConfigFactory.parseString("akka.remote.netty.hostname = "+getIP())   // same tree structure as config file where hostname value usually goes
+    //val system = ActorSystem("RemoteSystem", backup.withFallback(myConfig))
 
     val middleMan = remoteSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, daddy)), name = "MiddleMan")
 
