@@ -16,40 +16,33 @@ object Main extends App{
   val NUM_INIT_MSGS : Int = 100
   val NUM_ZEROS : Int = 3
   val NUM_MSGS_PER_BLOCK : Int = 1000
+  val IP_ADDR = getIP()
 
   sealed trait Msg
   case class Connect(numInitMsgs: Int) extends Msg
   case class WorkBlock(stringList: List[String]) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
-  val nets = NetworkInterface.getNetworkInterfaces
-
-  while(nets.hasMoreElements){
-    var temp = nets.nextElement().getInetAddresses
-    while(temp.hasMoreElements){
-      println(temp.nextElement().getHostAddress)
-    }
-  }
-
-  //val temp = nets.nextElement().getInetAddresses
-
-  //while(temp.hasMoreElements){
-  //  println(temp.nextElement().getHostAddress)
-  //}
-
   if(isLocal){
-    //initLocalSystem()
+    initLocalSystem()
   }
   else{
-    //initRemoteSystem()
+    initRemoteSystem()
   }
 
-  //val bigSystem = ActorSystem("BigSystem")
-  //val bigSystem = ActorSystem("BigSystem")
-  //val bigDaddy = bigSystem.actorOf(Props(BigDaddy), name = "BigDaddy")
-
-  //val workerSystem = ActorSystem("WorkerSystem")
-  //val localMiddleMan = bigSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, isLocal)), name = "LocalMiddleMan")
+  def getIP(): String = {
+    val nets = NetworkInterface.getNetworkInterfaces
+    while(nets.hasMoreElements){
+      val temp = nets.nextElement().getInetAddresses
+      while(temp.hasMoreElements){
+        val s = temp.nextElement()
+        if(s.isInstanceOf[Inet4Address]) {
+          return s.getHostAddress
+        }
+      }
+    }
+    return "No Network??"
+  }
 
   def initLocalSystem(){
     val bigSystem = ActorSystem("BigSystem")
@@ -99,7 +92,7 @@ object Main extends App{
 
         }
 
-        sender ! new WorkResponse(inputStrings.toList, hashes.toList, "PAWEL")
+        sender ! new WorkResponse(inputStrings.toList, hashes.toList, IP_ADDR)
 
     }
 
