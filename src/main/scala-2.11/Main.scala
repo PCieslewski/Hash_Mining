@@ -16,7 +16,7 @@ object Main extends App {
 
   val NUM_WORKERS: Int = 8
   val NUM_INIT_MSGS: Int = 100
-  val NUM_ZEROS: Int = 3
+  var NUM_ZEROS: Int = 3
   val NUM_MSGS_PER_BLOCK: Int = 1000
   val IP_ADDR = getIP()
 
@@ -25,21 +25,22 @@ object Main extends App {
   case class WorkBlock(stringList: List[String], numZeros: Int) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
-//  if (args(0).contains(".")) {
-//    isLocal = false
-//    initRemoteSystem()
-//  }
-//  else{
-//    isLocal = true
-//    initLocalSystem()
-//  }
-
-  if(isLocal){
-    initLocalSystem()
-  }
-  else{
+  if (args(0).contains(".")) {
+    isLocal = false
     initRemoteSystem()
   }
+  else{
+    isLocal = true
+    NUM_ZEROS = args(0).toInt
+    initLocalSystem()
+  }
+
+//  if(isLocal){
+//    initLocalSystem()
+//  }
+//  else{
+//    initRemoteSystem()
+//  }
 
   def getIP(): String = {
     val nets = NetworkInterface.getNetworkInterfaces
@@ -89,7 +90,7 @@ object Main extends App {
 
     //println(testConf.toString())
 
-    val bigSystem = ActorSystem("BigSystem", backup.withFallback(backup))
+    val bigSystem = ActorSystem("BigSystem", testConf.withFallback(backup))
     //val bigSystem = ActorSystem("BigSystem")
     val bigDaddy = bigSystem.actorOf(Props(new BigDaddy(NUM_ZEROS)), name = "BigDaddy")
 
@@ -105,7 +106,7 @@ object Main extends App {
 
   def initRemoteSystem(){
     val remoteSystem = ActorSystem("RemoteSystem")
-    val daddy = remoteSystem.actorSelection("akka.tcp://BigSystem@192.168.1.245:8009/user/BigDaddy")
+    val daddy = remoteSystem.actorSelection("akka.tcp://BigSystem@"+args(0)+":8009/user/BigDaddy")
 
     //val myConfig = ConfigFactory.load("application.conf")
     //val backup = ConfigFactory.parseString("akka.remote.netty.hostname = "+getIP())   // same tree structure as config file where hostname value usually goes
