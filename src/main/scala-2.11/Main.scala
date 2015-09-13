@@ -10,20 +10,29 @@ import com.typesafe.config.ConfigFactory
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-object Main extends App{
+object Main extends App {
 
-  val isLocal = true
+  var isLocal = true
 
-  val NUM_WORKERS : Int = 8
-  val NUM_INIT_MSGS : Int = 100
-  val NUM_ZEROS : Int = 3
-  val NUM_MSGS_PER_BLOCK : Int = 1000
+  val NUM_WORKERS: Int = 8
+  val NUM_INIT_MSGS: Int = 100
+  val NUM_ZEROS: Int = 3
+  val NUM_MSGS_PER_BLOCK: Int = 1000
   val IP_ADDR = getIP()
 
   sealed trait Msg
   case class Connect(numInitMsgs: Int) extends Msg
-  case class WorkBlock(stringList: List[String]) extends Msg
+  case class WorkBlock(stringList: List[String], numZeros: Int) extends Msg
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
+
+//  if (args(0).contains(".")) {
+//    isLocal = false
+//    initRemoteSystem()
+//  }
+//  else{
+//    isLocal = true
+//    initLocalSystem()
+//  }
 
   if(isLocal){
     initLocalSystem()
@@ -78,11 +87,11 @@ object Main extends App{
 
 
 
-    println(testConf.toString())
+    //println(testConf.toString())
 
-    val bigSystem = ActorSystem("BigSystem", testConf.withFallback(backup))
+    val bigSystem = ActorSystem("BigSystem", backup.withFallback(backup))
     //val bigSystem = ActorSystem("BigSystem")
-    val bigDaddy = bigSystem.actorOf(Props(new BigDaddy()), name = "BigDaddy")
+    val bigDaddy = bigSystem.actorOf(Props(new BigDaddy(NUM_ZEROS)), name = "BigDaddy")
 
     //val myConfig = ConfigFactory.load("application.conf")
     //val backup = ConfigFactory.parseString("akka.remote.netty.hostname = "+getIP())   // same tree structure as config file where hostname value usually goes
@@ -114,14 +123,15 @@ object Main extends App{
   }
 
   //Define Worker Actor
-  class Worker(numZeros: Int) extends Actor{
+  class Worker() extends Actor{
 
     //Create a zero string of length numZeros
-    val zeroString = ("%0"+numZeros.toString+"d").format(0)
 
     def receive = {
 
-      case WorkBlock(stringList: List[String]) =>
+      case WorkBlock(stringList: List[String], numZeros: Int) =>
+
+        val zeroString = ("%0"+numZeros.toString+"d").format(0)
 
         val hashes = new ListBuffer[String]()
         val inputStrings = new ListBuffer[String]()
@@ -145,7 +155,8 @@ object Main extends App{
   //Define Manager Actor
   class MiddleMan(numWorkers: Int, daddy: ActorSelection) extends Actor {
 
-    val props = Props(classOf[Worker], NUM_ZEROS) //NOT PASSED IN CONSTANT
+    val props = Props(classOf[Worker])
+    //val props = Props(classOf[Worker], NUM_ZEROS) //EXAMPLE OF HOW TO PASS ARGS TO ACTOR FACTORY
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
     //var daddy : ActorSelection = context.actorSelection(daddyPath)
 
@@ -165,7 +176,7 @@ object Main extends App{
 
   }
 
-  class BigDaddy() extends Actor {
+  class BigDaddy(numZeros: Int) extends Actor {
 
     val sgen = new StringGen("pawel")
 
@@ -175,14 +186,14 @@ object Main extends App{
         println("New Connection! "+sender.path.toString)
 
         for(i <- 0 to numInitMsgs){
-          sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
+          sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK), numZeros)
         }
 
       }
 
       case WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) => {
 
-        sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK))
+        sender ! new WorkBlock(sgen.genStringBlock(NUM_MSGS_PER_BLOCK), numZeros)
 
         for (i <- inputStrings.indices) {
           println(finder + " found a hash! Hash: " + inputStrings(i) + " is " + hashes(i))
