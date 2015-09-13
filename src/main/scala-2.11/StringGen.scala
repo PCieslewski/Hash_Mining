@@ -1,10 +1,12 @@
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
+//This classes purpose is to iteratively generate new hash strings.
 class StringGen(base: String){
   val chars = ('!' to '~')
   var perms:mutable.MutableList[Int] = mutable.MutableList(0)
 
+  //Create the next string to hash
   def genString(): String = {
 
     val sb = new StringBuilder(base)
@@ -16,6 +18,7 @@ class StringGen(base: String){
 
   }
 
+  //Create a block of strings to hash
   def genStringBlock(len: Int): List[String] = {
 
     val list = new ListBuffer[String]()
@@ -28,9 +31,9 @@ class StringGen(base: String){
 
   }
 
+  //Keep track of where we are in our string generation.
   def incPerms(){
 
-    //
     for(i <- 0 to perms.length-2) {
       perms(i) = perms(i) + 1
       if (perms(i) < chars.length) {
@@ -41,7 +44,7 @@ class StringGen(base: String){
       }
     }
 
-    //HANDLE LAST NUM
+    //Handle the last spot in the list
     perms(perms.length-1) = perms(perms.length-1) + 1
     if (perms.last < chars.length) {
       return

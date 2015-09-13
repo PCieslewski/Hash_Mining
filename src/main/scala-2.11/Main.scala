@@ -12,93 +12,62 @@ import scala.collection.mutable.ListBuffer
 
 object Main extends App {
 
-  //var isLocal = true
-
-  val NUM_WORKERS: Int = 8
-  val NUM_INIT_MSGS: Int = 100
-  var NUM_ZEROS: Int = 3
-  val NUM_MSGS_PER_BLOCK: Int = 1000
-  val IP_ADDR = getIP()
+  val NUM_WORKERS: Int = 8 //Number of workers each middle man spawns
+  val NUM_INIT_MSGS: Int = 100 //Numbers of messages the boss initially sends to the middle man.
+  var NUM_ZEROS: Int = 3 //Zeros we are looking for
+  val NUM_MSGS_PER_BLOCK: Int = 1000 //Hashes of work per block
+  val IP_ADDR = getIP() //Local IP
 
   sealed trait Msg
+
+  //Connection message to attach a middleman to the main boss.
   case class Connect(numInitMsgs: Int) extends Msg
+
+  //Contains work.
   case class WorkBlock(stringList: List[String], numZeros: Int) extends Msg
+
+  //Work response sent by the workers to the big boss.
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
+  //-----MAIN------------
+
+  //If the argument is an IP, run remote configuration
+  //else run the local configuration
   if (args(0).contains(".")) {
-    //isLocal = false
     initRemoteSystem()
   }
   else{
-    //isLocal = true
     NUM_ZEROS = args(0).toInt
     initLocalSystem()
   }
 
-//  if(isLocal){
-//    initLocalSystem()
-//  }
-//  else{
-//    initRemoteSystem()
-//  }
+  //------END MAIN--------
 
   def initLocalSystem(){
+    //Generate custom config file for local system to listen on LAN IP.
     val backup = ConfigFactory.load("application.conf")
     val localConfig = genConfig(getIP())
 
-//    val a = """
-//    akka {
-//      loglevel = "INFO"
-//
-//      actor {
-//        provider = "akka.remote.RemoteActorRefProvider"
-//      }
-//
-//      remote {
-//        enabled-transports = ["akka.remote.netty.tcp"]
-//        netty.tcp {
-//          hostname = """
-//
-//    val b = "\""+getIP()+"\""
-//
-//    val c = """
-//    port = 8009
-//      }
-//
-//      log-sent-messages = on
-//      log-received-messages = on
-//      }
-//
-//      }"""
-
-    //val testConf = ConfigFactory.parseString(a+b+c)
-
-
-
-    //println(testConf.toString())
-
+    //Create the system using the custom config file.
     val bigSystem = ActorSystem("BigSystem", localConfig.withFallback(backup))
-    //val bigSystem = ActorSystem("BigSystem")
+
+    //Create the overall boss of the entire distributed system.
     val bigDaddy = bigSystem.actorOf(Props(new BigDaddy(NUM_ZEROS)), name = "BigDaddy")
 
-    //val myConfig = ConfigFactory.load("application.conf")
-    //val backup = ConfigFactory.parseString("akka.remote.netty.hostname = "+getIP())   // same tree structure as config file where hostname value usually goes
-    //val system = ActorSystem("BigSystem", backup.withFallback(myConfig))
-
+    //Create the local branch of workers that connect to the main boss.
+    //daddy is the path to the big boss thats passed into a middle man.
     val daddy = bigSystem.actorSelection(bigDaddy.path)
-
     val middleMan = bigSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, daddy)), name = "MiddleMan")
 
   }
 
   def initRemoteSystem(){
+
+    //Create the remote system with the default configuration.
     val remoteSystem = ActorSystem("RemoteSystem")
+
+    //Create a local branch of workers that connect remotely to the big boss. Daddy is the path to the big boss.
     val daddy = remoteSystem.actorSelection("akka.tcp://BigSystem@"+args(0)+":8009/user/BigDaddy")
-
-    //val myConfig = ConfigFactory.load("application.conf")
-    //val backup = ConfigFactory.parseString("akka.remote.netty.hostname = "+getIP())   // same tree structure as config file where hostname value usually goes
-    //val system = ActorSystem("RemoteSystem", backup.withFallback(myConfig))
-
     val middleMan = remoteSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, daddy)), name = "MiddleMan")
 
   }
@@ -106,21 +75,18 @@ object Main extends App {
   //Define Worker Actor
   class Worker() extends Actor{
 
-    //Create a zero string of length numZeros
-
     def receive = {
 
-      case WorkBlock(stringList: List[String], numZeros: Int) =>
+      case WorkBlock(stringList: List[String], numZeros: Int) => {
 
-        val zeroString = ("%0"+numZeros.toString+"d").format(0)
-
+        val zeroString = ("%0" + numZeros.toString + "d").format(0)
         val hashes = new ListBuffer[String]()
         val inputStrings = new ListBuffer[String]()
 
-        for(str <- stringList){
+        for (str <- stringList) {
           val hash = hash256(str)
 
-          if(hash.startsWith(zeroString)) {
+          if (hash.startsWith(zeroString)) {
             hashes += hash
             inputStrings += str
           }
@@ -129,17 +95,20 @@ object Main extends App {
 
         sender ! new WorkResponse(inputStrings.toList, hashes.toList, IP_ADDR)
 
+      }
+
     }
 
   }
 
-  //Define Manager Actor
+  //Define the Middle Man Actor.
+  //This actor spawns off an array of workers on the machine that the middle man is on.
+  //The middle man controls all communication between the workers and the main boss.
   class MiddleMan(numWorkers: Int, daddy: ActorSelection) extends Actor {
 
     val props = Props(classOf[Worker])
     //val props = Props(classOf[Worker], NUM_ZEROS) //EXAMPLE OF HOW TO PASS ARGS TO ACTOR FACTORY
     val workerRouter = context.actorOf(props.withRouter(SmallestMailboxRouter(numWorkers)), name = "workerRouter")
-    //var daddy : ActorSelection = context.actorSelection(daddyPath)
 
     daddy ! new Connect(NUM_INIT_MSGS)
 
@@ -157,6 +126,8 @@ object Main extends App {
 
   }
 
+  //Actor definition for big daddy
+  //BigDaddy is the main boss that sends work, receives completed work, and prints bitcoins on the server machine.
   class BigDaddy(numZeros: Int) extends Actor {
 
     val sgen = new StringGen("pawel")
@@ -209,6 +180,7 @@ object Main extends App {
     return "No Network??"
   }
 
+  //This function generates a custom configuration file with the host set for the correct IP address.
   def genConfig(ip: String): Config ={
 
     val a = """
