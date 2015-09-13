@@ -1,0 +1,71 @@
+[0m[[0minfo[0m] [0mLoading project definition from /home/pawel/IdeaProjects/Project1/project[0m
+[0m[[0minfo[0m] [0mSet current project to Project1 (in build file:/home/pawel/IdeaProjects/Project1/)[0m
+[0m[[0minfo[0m] [0mRunning Main 7[0m
+[INFO] [09/13/2015 01:37:49.383] [run-main-0] [Remoting] Starting remoting
+[INFO] [09/13/2015 01:37:49.471] [run-main-0] [Remoting] Remoting started; listening on addresses :[akka.tcp://BigSystem@192.168.1.245:8009]
+[INFO] [09/13/2015 01:37:49.473] [run-main-0] [Remoting] Remoting now listens on addresses: [akka.tcp://BigSystem@192.168.1.245:8009]
+New Connection! akka://BigSystem/user/MiddleMan
+New Connection! akka.tcp://RemoteSystem@192.168.1.135:8009/user/MiddleMan
+New Connection! akka.tcp://RemoteSystem@127.0.1.1:8009/user/MiddleMan
+192.168.1.245 found a hash! Hash: pawel/<kP* is 000000094dd4ebd12ec2a8a3a4bc64aabdbe98573320630bfd1f9da52297e7b4
+192.168.1.245 found a hash! Hash: pawel2G$J+ is 00000003afb1af50416a069f10e29fc00fe84269256f54e659b97c99867a179a
+New Connection! akka.tcp://RemoteSystem@127.0.1.1:8009/user/MiddleMan
+New Connection! akka.tcp://RemoteSystem@127.0.1.1:8009/user/MiddleMan
+192.168.1.245 found a hash! Hash: paweleUks2 is 000000042fd8c4c0b27a5f834c88abe159650979a216af63c8074d22f387bb54
+192.168.1.245 found a hash! Hash: pawelwMvZ5 is 0000000d17192e37e6b81ff36dbb3361b27ef1ab6a59ac087cd63c95874dfbbe
+192.168.1.245 found a hash! Hash: pawel%,6G8 is 0000000228be118e8523d220bba074df56b3bb26183494c0a88bf24431129e12
+[INFO] [09/13/2015 03:30:34.019] [BigSystem-akka.actor.default-dispatcher-20] [akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.114%3A46613-4] Message [akka.remote.transport.AssociationHandle$InboundPayload] from Actor[akka://BigSystem/deadLetters] to Actor[akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.114%3A46613-4#751613986] was not delivered. [1] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [09/13/2015 03:30:34.024] [BigSystem-akka.actor.default-dispatcher-14] [akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.114%3A46613-4] Message [akka.remote.transport.AssociationHandle$InboundPayload] from Actor[akka://BigSystem/deadLetters] to Actor[akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.114%3A46613-4#751613986] was not delivered. [2] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+New Connection! akka.tcp://RemoteSystem@127.0.1.1:8009/user/MiddleMan
+192.168.1.245 found a hash! Hash: pawelwNUy9 is 0000000f15a9b3603e8d446aa54d3dc2bd1c6955a3403cbf0803c17077765f57
+192.168.1.135 found a hash! Hash: pawel`pXUA is 0000000f32a01b00dadd4594d00fb1839c3be8b45819618f25852ec7542524c0
+192.168.1.61 found a hash! Hash: pawel:8<8D is 0000000055b0dba962333dc052b90ebd3e4e34cad83f3983a81efcd8b3baca4a
+192.168.1.245 found a hash! Hash: pawel+yErE is 0000000d50b0194b077b52ca6d0f0e2351ee0b00f19c440fe2e31515dd0cf83f
+192.168.1.245 found a hash! Hash: pawel!D`-F is 0000000b71781fe62b913e3ed4cfb1fdbe90cd11d37cb23fae364ca9a711ad54
+192.168.1.135 found a hash! Hash: pawelS~O-H is 0000000ae62d011eca3271bc041ff3a82bdef0d170dd5fe9ea16c8d5dc1408aa
+192.168.1.245 found a hash! Hash: pawel<h+*Q is 00000006fb62f0464dc198ac084bd26a7f4564e71250e64e207c21899fee55d3
+192.168.1.245 found a hash! Hash: pawelx}95R is 0000000794d4b64cfa399ab442af1f17fdbfce372084182b0d756b2ca9238401
+192.168.1.245 found a hash! Hash: pawel9<s\R is 0000000633b248794e17ef42758ebe1c350b99c4f470776365f13fd22225d9e2
+192.168.1.135 found a hash! Hash: pawelN&>3U is 0000000310800efa5a9c054a070454a8871fc305a2c8252b183b64fbbe29d79f
+192.168.1.135 found a hash! Hash: pawelny0tV is 0000000e687dacfa421638b5b35b5a714c71cce5d937874ecd07292cea788341
+192.168.1.245 found a hash! Hash: pawel\A''X is 00000007d2f72e3ca92f641738f1b3347a8a0c21b0d1e5991a2735ab866efadf
+192.168.1.245 found a hash! Hash: pawelL_k3Y is 0000000e9bc3c9a85a6940f4310db7836e78185095500de0da72ae8d5531a4b2
+192.168.1.245 found a hash! Hash: pawel/|n4\ is 000000010c4b68a29baa9620158bae36925b43bce526304f22cf7b44ff9ed2f3
+192.168.1.135 found a hash! Hash: pawel_gxi_ is 0000000c0820c8b8e080ce497d7f0578ac787b3f5e749fdb28dcb6c060d71f42
+192.168.1.135 found a hash! Hash: pawelximrf is 0000000ae42565250fd0e89c159bebafa68693542cda6e051d9aa91eed7f5f18
+192.168.1.245 found a hash! Hash: pawelL;U9i is 00000000145a4da6bf75801f8d23df7d5d5cab1767443278af3f0eed46df1dbe
+192.168.1.135 found a hash! Hash: paweln%`Ym is 0000000226059b7d1e7d3f38d49b260968caff8af13ac3ed4cb8c94c1c564f61
+192.168.1.135 found a hash! Hash: pawelgVVfp is 0000000209c2981bce3b6c3a864212f9f1bcced62efb5531735d1bf15fee5a3e
+192.168.1.245 found a hash! Hash: pawelIV`Nv is 0000000107a43b2b40aabcbf3a7c24f04642f93129b6d25313bb4dc21fdef717
+192.168.1.245 found a hash! Hash: pawelNKEFz is 0000000df6a20fd62fe8e310a7716d79754c4042b22c140fbfaab8643c00bb03
+192.168.1.245 found a hash! Hash: pawel0aXH{ is 0000000b3d0976c3de7aee03ab02a068bc1a7e02d90948d6de62cc4fe1e9a9f1
+192.168.1.135 found a hash! Hash: pawel6DTl!! is 0000000b467355b671a3852a939da1ff0276979665fd3321e8cb532be881132a
+192.168.1.245 found a hash! Hash: pawelAg(~%! is 00000009553e5af8e6a823302e4945d052889a12d138a637f5d8abc4ba4dee9b
+192.168.1.245 found a hash! Hash: pawelmEtb/! is 0000000f921b1474f01a063346319da1db67600041f05a02e51b76c3a9f5745a
+192.168.1.135 found a hash! Hash: pawel*1KC0! is 0000000a396834e278063e6e6e69b45b63aa53b97d436357fdc9893b34613046
+192.168.1.135 found a hash! Hash: paweltf\h5! is 0000000b8ee3ffe2b10b3196251c0536a44c95e86bef52e1097e4899ef8b1bbb
+192.168.1.245 found a hash! Hash: pawel8N&b7! is 00000000da2a1bddb3318bd684e5cda0946e99b220093478eea08d66d3410dc9
+192.168.1.135 found a hash! Hash: pawel[f=z7! is 0000000dcf0b273b79a658df87c65e5808dd61fddfaf992818c99a18d2c63235
+[INFO] [09/13/2015 10:15:46.057] [BigSystem-akka.actor.default-dispatcher-15] [akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.61%3A55184-5] Message [akka.remote.transport.AssociationHandle$InboundPayload] from Actor[akka://BigSystem/deadLetters] to Actor[akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.61%3A55184-5#-1147735230] was not delivered. [3] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[INFO] [09/13/2015 10:15:46.057] [BigSystem-akka.actor.default-dispatcher-15] [akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.61%3A55184-5] Message [akka.remote.transport.AssociationHandle$InboundPayload] from Actor[akka://BigSystem/deadLetters] to Actor[akka://BigSystem/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.61%3A55184-5#-1147735230] was not delivered. [4] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+New Connection! akka.tcp://RemoteSystem@127.0.1.1:8009/user/MiddleMan
+192.168.1.135 found a hash! Hash: pawel]{XSG! is 0000000756f5809cde2a3972aa2c5dd077500d1364e66fd49cf243ea36c41a0a
+192.168.1.245 found a hash! Hash: pawelE->~L! is 000000050cdb087fdc6e40ba2293ba5dab510880b67bc82016cf3a8490c1a10e
+192.168.1.114 found a hash! Hash: pawelJ{LpP! is 00000008dd6225054b330f8da106561dd34442a068bd9de27ddd01e8df2b35a7
+192.168.1.245 found a hash! Hash: pawely\L?R! is 0000000bcf85242402c67a1bf837f7b642adf032f7bb910b8387c5a727aa0a7b
+192.168.1.245 found a hash! Hash: pawel7CYQT! is 0000000f350b8af91897ea9f18028b4086ae8bc701e8708311b4ef146a4df9f9
+192.168.1.245 found a hash! Hash: pawel2Br]T! is 00000005d26caca4e92b47bf8936c94c5c3e8b223d2984f0d5f6fb7f4a0b7467
+192.168.1.114 found a hash! Hash: pawelv7>ZU! is 000000013d9547cdd6a7b4c0245d9c6edda667766eb66be14381ea6d8a694ac1
+192.168.1.245 found a hash! Hash: pawel,Q|ZU! is 0000000c470be355891668d72743dcd1ff6764c9fe1a139bd2d956bea4e430f1
+192.168.1.245 found a hash! Hash: pawel.<Le[! is 0000000beea7199f7c27670c6ac8ea823e19fb9987ce62f8634ef29a456389f4
+192.168.1.114 found a hash! Hash: pawelzE29b! is 0000000e8722bc57ca8d98d7a4a265a0dd59d1de92408c6667933e8c76e273e0
+192.168.1.245 found a hash! Hash: pawelHDIcc! is 00000000707f2431a28890e998184aaa697881509803f427ab4bd22dc1b64243
+192.168.1.245 found a hash! Hash: pawelvPSbe! is 0000000279120135ad75e8afa3f97826fa221d0dc48d1bf28aa475d42440d115
+192.168.1.135 found a hash! Hash: pawelF9.Af! is 0000000ccc146d77e7feef3649c3960d082f1e615d1fd96b8efdf5d7609826d5
+192.168.1.114 found a hash! Hash: pawelEo<%w! is 000000070b639e91519ef95770d014f4bff42260dadea595aa5fa9fabdcac133
+192.168.1.245 found a hash! Hash: pawel|f|[w! is 00000006dab65d1245ccbcfb75f1644bed5413cf80e1adaba01bc4c26c06c9e6
+[INFO] [09/13/2015 15:02:02.717] [BigSystem-akka.remote.default-remote-dispatcher-5] [akka.tcp://BigSystem@192.168.1.245:8009/system/transports/akkaprotocolmanager.tcp0/akkaProtocol-tcp%3A%2F%2FBigSystem%40192.168.1.135%3A50438-1] No response from remote. Handshake timed out or transport failure detector triggered.
+[WARN] [09/13/2015 15:02:02.736] [BigSystem-akka.remote.default-remote-dispatcher-5] [akka.tcp://BigSystem@192.168.1.245:8009/system/endpointManager/reliableEndpointWriter-akka.tcp%3A%2F%2FRemoteSystem%40192.168.1.135%3A8009-0] Association with remote system [akka.tcp://RemoteSystem@192.168.1.135:8009] has failed, address is now gated for [5000] ms. Reason: [Disassociated] 
+192.168.1.114 found a hash! Hash: pawelB`^k}! is 00000003df71a4d04c00ea31bcb20684e232f556cf28150aaba40d9362651c4a
+192.168.1.245 found a hash! Hash: pawelDi,k!" is 000000049b6a636fe6d69704f6bd76372c1a06647625de41f06587ccfd6a10f8
+192.168.1.245 found a hash! Hash: pawel~e%+(" is 0000000431280f4c28f219b9299fc651836950d49453ca1218ab31aa089f5b86
