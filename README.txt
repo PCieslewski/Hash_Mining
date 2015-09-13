@@ -1,3 +1,7 @@
+GROUP MEMBERS:
+-PAWEL CIEWSLEWSKI (2169-8969)
+-WILL LIVESEY (1874-1956)
+
 HOW TO RUN:
 -Download the zip
 -On the server machine type: sbt “run #” 
