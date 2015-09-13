@@ -5,14 +5,14 @@ import akka.routing.{SmallestMailboxRouter, RoundRobinRouter}
 import java.security.MessageDigest
 import java.net._
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 object Main extends App {
 
-  var isLocal = true
+  //var isLocal = true
 
   val NUM_WORKERS: Int = 8
   val NUM_INIT_MSGS: Int = 100
@@ -26,11 +26,11 @@ object Main extends App {
   case class WorkResponse(inputStrings: List[String], hashes: List[String], finder: String) extends Msg
 
   if (args(0).contains(".")) {
-    isLocal = false
+    //isLocal = false
     initRemoteSystem()
   }
   else{
-    isLocal = true
+    //isLocal = true
     NUM_ZEROS = args(0).toInt
     initLocalSystem()
   }
@@ -42,55 +42,42 @@ object Main extends App {
 //    initRemoteSystem()
 //  }
 
-  def getIP(): String = {
-    val nets = NetworkInterface.getNetworkInterfaces
-    while(nets.hasMoreElements){
-      val temp = nets.nextElement().getInetAddresses
-      while(temp.hasMoreElements){
-        val s = temp.nextElement()
-        if(s.isInstanceOf[Inet4Address]) {
-          return s.getHostAddress
-        }
-      }
-    }
-    return "No Network??"
-  }
-
   def initLocalSystem(){
     val backup = ConfigFactory.load("application.conf")
+    val localConfig = genConfig(getIP())
 
-    val a = """
-    akka {
-      loglevel = "INFO"
+//    val a = """
+//    akka {
+//      loglevel = "INFO"
+//
+//      actor {
+//        provider = "akka.remote.RemoteActorRefProvider"
+//      }
+//
+//      remote {
+//        enabled-transports = ["akka.remote.netty.tcp"]
+//        netty.tcp {
+//          hostname = """
+//
+//    val b = "\""+getIP()+"\""
+//
+//    val c = """
+//    port = 8009
+//      }
+//
+//      log-sent-messages = on
+//      log-received-messages = on
+//      }
+//
+//      }"""
 
-      actor {
-        provider = "akka.remote.RemoteActorRefProvider"
-      }
-
-      remote {
-        enabled-transports = ["akka.remote.netty.tcp"]
-        netty.tcp {
-          hostname = """
-
-    val b = "\""+getIP()+"\""
-
-    val c = """
-    port = 8009
-      }
-
-      log-sent-messages = on
-      log-received-messages = on
-      }
-
-      }"""
-
-    val testConf = ConfigFactory.parseString(a+b+c)
+    //val testConf = ConfigFactory.parseString(a+b+c)
 
 
 
     //println(testConf.toString())
 
-    val bigSystem = ActorSystem("BigSystem", testConf.withFallback(backup))
+    val bigSystem = ActorSystem("BigSystem", localConfig.withFallback(backup))
     //val bigSystem = ActorSystem("BigSystem")
     val bigDaddy = bigSystem.actorOf(Props(new BigDaddy(NUM_ZEROS)), name = "BigDaddy")
 
@@ -114,13 +101,6 @@ object Main extends App {
 
     val middleMan = remoteSystem.actorOf(Props(new MiddleMan(NUM_WORKERS, daddy)), name = "MiddleMan")
 
-  }
-
-  //Defining hashing function
-  def hash256(in : String): String = {
-    val bytes: Array[Byte] = MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8"))
-    val sep: String = ""
-    bytes.map("%02x".format(_)).mkString(sep)
   }
 
   //Define Worker Actor
@@ -206,4 +186,59 @@ object Main extends App {
 
   }
 
+  //Defining hashing function
+  def hash256(in : String): String = {
+    val bytes: Array[Byte] = MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8"))
+    val sep: String = ""
+    bytes.map("%02x".format(_)).mkString(sep)
+  }
+
+  //Define the function that returns the LAN IP address of the current machine.
+  //This is used to setup config files and identify machines in the logs.
+  def getIP(): String = {
+    val nets = NetworkInterface.getNetworkInterfaces
+    while(nets.hasMoreElements){
+      val temp = nets.nextElement().getInetAddresses
+      while(temp.hasMoreElements){
+        val s = temp.nextElement()
+        if(s.isInstanceOf[Inet4Address]) {
+          return s.getHostAddress
+        }
+      }
+    }
+    return "No Network??"
+  }
+
+  def genConfig(ip: String): Config ={
+
+    val a = """
+    akka {
+      loglevel = "INFO"
+
+      actor {
+        provider = "akka.remote.RemoteActorRefProvider"
+      }
+
+      remote {
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = """
+
+    val b = "\""+ip+"\""
+
+    val c = """
+    port = 8009
+      }
+
+      log-sent-messages = on
+      log-received-messages = on
+      }
+
+      }"""
+
+    return ConfigFactory.parseString(a+b+c)
+
+  }
+
 }
+
